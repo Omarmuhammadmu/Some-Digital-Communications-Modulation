@@ -208,7 +208,7 @@ xlabel('E_b/N_0')
 title('Bit Error Rate for QPSK')
 legend('Theoretical','Calculated');
 
-figure (6)
+figure (4)
 EbN0_dB = 1:1:(SNR_max_value + 1) ;
 %Plotting theoritical BER
 semilogy((EbN0_dB - 1),QPSK_BER_encode2,'-x')
@@ -220,6 +220,7 @@ ylabel('BER')
 xlabel('E_b/N_0')
 title('Bit Error Rate for QPSK')
 legend('2nd encode method','grey encoded');
+
 %% 8PSK
 %initializations needed for Simulation of BPSK
 M = 8;                  %Numbers of symboles
