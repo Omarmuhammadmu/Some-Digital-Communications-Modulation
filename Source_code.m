@@ -82,6 +82,8 @@ legend('Theoretical','Calculated');
 QPSK_Eb = ((4 * 2) / 4 ) / 2;
 QPSK_BER_Theo = zeros(1,SNR_max_value);             %Vector to store the theortical BER for different SNR channel
 QPSK_BER = zeros(1,SNR_max_value);                  %Vector to store the calculated BER for different SNR channel
+QPSK_BER_encode2 = zeros(1,SNR_max_value);                  %Vector to store the calculated BER for different SNR channel
+
 
 %Mapper
 %Grouping the binary data into groups of 2 bits
@@ -93,10 +95,17 @@ QPSK_reshaped_binary_data = reshape(Bit_Stream,2,[])';
 %  1 0 ->  1-1i
 %  1 1 ->  1+1i
 QPSK_map = [-1-1i, -1+1i, 1-1i, 1+1i];
+%  0 0 -> -1-1i
+%  0 1 -> -1+1i
+%  1 0 ->  1+1i
+%  1 1 ->  1-1i
+QPSK_map_encode2 = [-1-1i, -1+1i,1+1i, 1-1i];
+
 
 %The bi2de function is used to convert the binary data to decimal values,
 %which are then used as indices to look up the corresponding QPSK symbol in the mapping table
 QPSK_data = QPSK_map(bi2de(QPSK_reshaped_binary_data,'left-msb')+1);
+QPSK_data_encode2 = QPSK_map_encode2(bi2de(QPSK_reshaped_binary_data,'left-msb')+1);
 
 %Channel (AWGN)
 QPSK_channelNoise_real = zeros(length(Bit_Stream)/2,SNR_max_value); %Matrix to store the real noise in each channel
@@ -118,7 +127,10 @@ end
 
 %Demapper
 QPSK_demappedBits = zeros(1,length(Bit_Stream));   %Vector to store the demapped stream
+QPSK_demappedBits_encode2 = zeros(1,length(Bit_Stream));   %Vector to store the demapped stream
 QPSK_recieved_Bits = zeros((Bits_Number/2),2);
+QPSK_recieved_Bits_encode2 = zeros((Bits_Number/2),2);
+
 
 for SNR_dB = 1 : (SNR_max_value + 1)
     
@@ -126,7 +138,11 @@ for SNR_dB = 1 : (SNR_max_value + 1)
     QPSK_DataRx = (real(QPSK_data)+ QPSK_channelNoise_real(:,SNR_dB)') ...
     + 1i *(imag(QPSK_data)+ QPSK_channelNoise_complex(:,SNR_dB)'); 
 
+    QPSK_DataRx_encode2 = (real(QPSK_data_encode2)+ QPSK_channelNoise_real(:,SNR_dB)') ...
+    + 1i *(imag(QPSK_data_encode2)+ QPSK_channelNoise_complex(:,SNR_dB)'); 
+
     %Demapping the recieved symbol stream for each channel
+    %Grey encoded
     for counter = 1 : Bits_Number/2
         if(real(QPSK_DataRx(counter)) > 0)
             QPSK_recieved_Bits(counter,1) = 1;
@@ -141,8 +157,32 @@ for SNR_dB = 1 : (SNR_max_value + 1)
         end
     end
     QPSK_demappedBits = reshape(QPSK_recieved_Bits',1,[]);
+
+    %Demapping the recieved symbol stream for each channel
+    %second encoding method
+    for counter = 1 : Bits_Number/2
+        if(imag(QPSK_DataRx_encode2(counter)) > 0)
+            if(real(QPSK_DataRx_encode2(counter)) > 0)
+                QPSK_recieved_Bits_encode2(counter,1) = 1;
+                QPSK_recieved_Bits_encode2(counter,2) = 0;
+            else
+                QPSK_recieved_Bits_encode2(counter,1) = 0;
+                QPSK_recieved_Bits_encode2(counter,2) = 1;
+            end
+        else
+            if(real(QPSK_DataRx_encode2(counter)) > 0)
+                QPSK_recieved_Bits_encode2(counter,1) = 1;
+                QPSK_recieved_Bits_encode2(counter,2) = 1;
+            else
+                QPSK_recieved_Bits_encode2(counter,1) = 0;
+                QPSK_recieved_Bits_encode2(counter,2) = 0;
+            end
+        end
+    end
+    QPSK_demappedBits_encode2 = reshape(QPSK_recieved_Bits_encode2',1,[]);
     
     [N_BER_QPSK,QPSK_BER(SNR_dB)] = symerr(QPSK_demappedBits,Bit_Stream); %Calculated BER
+    [N_BER_QPSK_2,QPSK_BER_encode2(SNR_dB)] = symerr(QPSK_demappedBits_encode2,Bit_Stream); %Calculated BER
     QPSK_BER_Theo(SNR_dB)= 0.5 * erfc(sqrt(1/QPSK_No(SNR_dB))); %Theoritical BER
 end
 
@@ -168,6 +208,18 @@ xlabel('E_b/N_0')
 title('Bit Error Rate for QPSK')
 legend('Theoretical','Calculated');
 
+figure (6)
+EbN0_dB = 1:1:(SNR_max_value + 1) ;
+%Plotting theoritical BER
+semilogy((EbN0_dB - 1),QPSK_BER_encode2,'-x')
+%Plotting calculated BER
+hold on
+semilogy((EbN0_dB - 1),QPSK_BER,'-o')
+grid on
+ylabel('BER')
+xlabel('E_b/N_0')
+title('Bit Error Rate for QPSK')
+legend('2nd encode method','grey encoded');
 %% 8PSK
 %initializations needed for Simulation of BPSK
 M = 8;                  %Numbers of symboles
@@ -457,7 +509,3 @@ title("BER_{theoritical and calculated} of some modulation techniques");
 % symrr implementation 
 %     num_bit_errors = sum(M8PSK_demappedBits ~= Bit_Stream);
 %     bit_error_rate(SNR_dB) = num_bit_errors / length(Bit_Stream);
-
-
-
-
