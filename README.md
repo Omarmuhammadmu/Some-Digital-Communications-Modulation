@@ -10,6 +10,6 @@ The simulated Modulation techniques are:
 * All simulations are done on the baseband equivalent system, with no carriers.
 
 # Repository content:
-- Matlab code for the five modulation techniques (Function based files and one file project)
+- Matlab code for the five modulation techniques.
 - Screenshots of the results of BERs and Constellation of each technique.
 - Project requirements and results documentation in form of PDF files.
