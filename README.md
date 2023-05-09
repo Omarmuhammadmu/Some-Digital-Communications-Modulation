@@ -8,3 +8,8 @@ The simulated Modulation techniques are:
 
 * The communication channel's noise is additive wide gaussian noise(AWGN)
 * All simulations are done on the baseband equivalent system, with no carriers.
+
+# Repository content:
+- Matlab code for the five modulation techniques (Function based files and one file project)
+- Screenshots of the results of BERs and Constellation of each technique.
+- Project requirements and results documentation in form of PDF files.
