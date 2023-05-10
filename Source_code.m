@@ -504,9 +504,4 @@ legend('Theoretical BSPK BER','Theoretical QPSK BER','Theoretical 8PSK BER',...
 xlabel('E_{b}/N_{o}');
 ylabel('BER');
 title("BER_{theoritical and calculated} of some modulation techniques");
-
-
-%% Another implementations
-% symrr implementation 
-%     num_bit_errors = sum(M8PSK_demappedBits ~= Bit_Stream);
-%     bit_error_rate(SNR_dB) = num_bit_errors / length(Bit_Stream);
+% End of File [Source_Code.m]
