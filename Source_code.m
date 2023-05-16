@@ -463,9 +463,6 @@ xlabel('E_b/N_0')
 title('Bit Error Rate for 16QAM')
 legend('Theoretical','Calculated');
 
-%% BFSK
-%------------ BFSK Code goes here ---------
-
 %% Plotting all the BER, theoritcal and calculated, on the same graph
 figure(3)
 EbN0_dB = 1:1:(SNR_max_value + 1) ;
@@ -495,8 +492,6 @@ semilogy((EbN0_dB - 1),M8PSK_BER,'-x')
 hold on
 %Plotting calculated 16QAM_BER
 semilogy((EbN0_dB - 1),QAM16_BER,'-+')
-%Plotting calculated BFSK_BER
-%---- Plot the BFSK BER here -----
 hold off
 grid on
 legend('Theoretical BSPK BER','Theoretical QPSK BER','Theoretical 8PSK BER',...
